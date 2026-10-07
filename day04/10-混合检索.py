@@ -3,6 +3,7 @@ from llama_index.core import SimpleDirectoryReader, StorageContext, VectorStoreI
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.retrievers import QueryFusionRetriever
+from llama_index.core.retrievers.fusion_retriever import FUSION_MODES
 from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.retrievers.bm25 import BM25Retriever
 from llama_index.vector_stores.chroma import ChromaVectorStore
@@ -39,12 +40,13 @@ retriever = QueryFusionRetriever(
     retrievers=[
         index.as_retriever(similarity_top_k=2),
         BM25Retriever.from_defaults(
-            docstore=doc_store,
+            docstore=index.docstore,
             similarity_top_k=2
         )
     ],
+    mode=FUSION_MODES.RECIPROCAL_RANK,
     # 生成同义词的问题数量
-    num_queries=1,
+    num_queries=4,
     use_async=True,
     verbose=True
 )

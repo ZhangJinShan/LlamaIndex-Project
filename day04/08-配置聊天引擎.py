@@ -55,10 +55,10 @@ custom_template = PromptTemplate("""
 custom_chat_history = [
     ChatMessage(
         role=MessageRole.USER,
-        content="萧炎斗之力是多少段？",
+        content="萧炎斗之气是多少段？",
     ),
     ChatMessage(role=MessageRole.ASSISTANT,
-                content="根据文档中的信息，萧炎的斗之力是三段。这在第一章中明确提到：“斗之力，三段！”并且还描述了他在测验魔石碑上看到这个结果时的情景。"),
+                content="根据文档中的信息，萧炎的斗之力是三段。这在第一章中明确提到：“斗之气，三段！”并且还描述了他在测验魔石碑上看到这个结果时的情景。"),
 ]
 
 # 创建查询引擎

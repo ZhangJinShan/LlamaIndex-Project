@@ -6,6 +6,7 @@ from util.load_model import get_llm, get_embed
 llm = get_llm()
 embed = get_embed()
 
+# 加载文档
 documents = SimpleDirectoryReader(input_files=["./data/小说.txt"]).load_data()
 
 # 创建属性图索引
@@ -18,6 +19,7 @@ retriever = property_graph_index.as_retriever(
 nodes = retriever.retrieve("萧炎的斗之力是多少？")
 
 print(nodes)
+
 query_engine = property_graph_index.as_query_engine(
     include_text=False,  # 包括与匹配路径的源块
     similarity_top_k=3,  # 向量 kg 节点检索的前 k 个

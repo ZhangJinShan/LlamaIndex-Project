@@ -9,16 +9,16 @@ embed = load_model.get_embed()
 # 加载文档
 documents = SimpleDirectoryReader(input_files=["data/小说.txt"]).load_data()
 
-# # 创建索引对象
-# index = VectorStoreIndex.from_documents(documents)
-# #
-# # # 查询引擎用来提问
-# # res = index.as_query_engine().query("萧炎，斗之力？")
-# # print(res)
+# 创建索引对象
+index = VectorStoreIndex.from_documents(documents)
 #
-# # 流式输出
-# res = index.as_query_engine(streaming=True).query("萧炎，斗之力？")
-# res.print_response_stream()
+# # 查询引擎用来提问
+# res = index.as_query_engine().query("萧炎，斗之力？")
+# print(res)
+
+# 流式输出
+res = index.as_query_engine(streaming=True).query("萧炎，斗之力？")
+res.print_response_stream()
 """ 
     虽然通过以下代码对易用性进行了优化，但它并未公开全部的可配置性。
         query_engine = index.as_query_engine(

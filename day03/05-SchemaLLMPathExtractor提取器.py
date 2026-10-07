@@ -45,26 +45,36 @@ relations = Literal[
     "IN_LOCATION",
 ]
 
-# 定义更详细的图谱模式
-schema = {
-    "Person": ["WORKS_AT", "BOARD_MEMBER", "CEO", "HAS_EVENT"],
-    "Organization": [
-        "SUPPLIER_OF",
-        "COMPETITOR",
-        "PARTNERSHIP",
-        "ACQUISITION",
-        "WORKS_AT",
-        "SUBSIDIARY",
-        "BOARD_MEMBER",
-        "CEO",
-        "PROVIDES",
-        "HAS_EVENT",
-        "IN_LOCATION",
-    ],
-    "Product": ["PROVIDES"],
-    "Event": ["HAS_EVENT", "IN_LOCATION"],
-    "Location": ["HAPPENED_AT", "IN_LOCATION"],
-}
+# 定义更详细的图谱模式：(主体类型, 关系类型, 客体类型)
+# 注意：传 list 时 SchemaLLMPathExtractor 会内部包成 {"relationships": [...]}，
+# strict=True 时按 **完整三元组** 精确匹配（比原来的 dict 形式更严格）
+schema: list[tuple[str, str, str]] = [
+    # ---- Person ----
+    ("Person", "WORKS_AT", "Organization"),
+    ("Person", "BOARD_MEMBER", "Organization"),
+    ("Person", "CEO", "Organization"),
+    ("Person", "HAS_EVENT", "Event"),
+    # ---- Organization ----
+    ("Organization", "CEO", "Person"),
+    ("Organization", "BOARD_MEMBER", "Person"),
+    ("Organization", "SUPPLIER_OF", "Organization"),
+    ("Organization", "COMPETITOR", "Organization"),
+    ("Organization", "PARTNERSHIP", "Organization"),
+    ("Organization", "ACQUISITION", "Organization"),
+    ("Organization", "SUBSIDIARY", "Organization"),
+    ("Organization", "WORKS_AT", "Organization"),
+    ("Organization", "PROVIDES", "Product"),
+    ("Organization", "HAS_EVENT", "Event"),
+    ("Organization", "IN_LOCATION", "Location"),
+    # ---- Product ----
+    ("Product", "PROVIDES", "Organization"),
+    # ---- Event ----
+    ("Event", "HAS_EVENT", "Organization"),
+    ("Event", "HAS_EVENT", "Person"),
+    ("Event", "IN_LOCATION", "Location"),
+    # ---- Location ----
+    ("Location", "IN_LOCATION", "Location"),
+]
 
 zh_extract_prompt_str = """
     你是一个专业的知识图谱提取助手。你的任务是从给定的文本中提取结构化的三元组（主体-关系-客体）。
@@ -106,14 +116,17 @@ extractor = SchemaLLMPathExtractor(
 # 创建属性图
 property_graph_index = PropertyGraphIndex.from_documents(
     documents=documents,
-    kg_extractor=[extractor],
+    kg_extractors=[extractor],
     show_progress=True)
 
-# # 检查属性是否存在
-# print(hasattr(property_graph_index.property_graph_store, "graph"))
-# # 如果存在，直接打印数量
-# if hasattr(property_graph_index.property_graph_store, "graph"):
-#     print("内存图谱中的三元组总数:", property_graph_index.property_graph_store.graph.triplets)
+# 检查属性是否存在
+print(hasattr(property_graph_index.property_graph_store, "graph"))
+# 如果存在，直接打印数量
+if hasattr(property_graph_index.property_graph_store, "graph"):
+    print("内存图谱中的三元组总数:", property_graph_index.property_graph_store.graph.triplets)
+
+# response = property_graph_index.property_graph_store.get_triplets(["张伟"])
+# print("response->", response)
 
 
 """
@@ -124,8 +137,6 @@ llm_synonym_retriever = LLMSynonymRetriever(
     graph_store=property_graph_index.property_graph_store,
     # 包括检索路径的源块文本
     include_text=False,
-    llm=llm,
-    embed_model=embed,
     max_keywords=10,  # 要生成的同义词的数量
     # 节点检索后要遵循的关系深度
     path_depth=1
@@ -143,7 +154,6 @@ print("--------" * 10)
 """
 vector_context_retriever = VectorContextRetriever(
     graph_store=property_graph_index.property_graph_store,
-    llm=llm,
     embed_model=embed,
     vector_store=property_graph_index.vector_store,
     # 包括检索路径的源块文本

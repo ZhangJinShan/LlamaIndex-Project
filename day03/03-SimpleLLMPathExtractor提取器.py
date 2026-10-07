@@ -7,7 +7,7 @@ from util.load_model import get_embed, get_llm
 llm = get_llm()
 embed = get_embed()
 
-# 加载文档并构建索引
+# 加载文档
 documents = SimpleDirectoryReader(
     input_files=["./data/小说.txt"]
 ).load_data()
@@ -18,16 +18,17 @@ kg_extractor = SimpleLLMPathExtractor(
     max_paths_per_chunk=10,  # 控制从每个文档块(chunk)中最多提取多少条路径
     num_workers=4  # 并行数量
 )
-
-print("kg_extractor->", kg_extractor)
-
 # 创建属性图
 index = PropertyGraphIndex.from_documents(
-    documents,
-    kg_extractor=kg_extractor,
+    documents=documents,
+    transformations=[kg_extractor],
     show_progress=True  # 显示提取进度
 )
 # 查看结果
-response = index.property_graph_store.get_triplets(entity_names=["萧炎"])
-print("response->", response)
+triplets = index.property_graph_store.get_triplets(entity_names=["萧炎"])
+
+for subj, rel, obj in triplets:
+    # 解包成 (LabelledNode, Relation, LabelledNode)
+    print(subj, "->" , rel, "->", obj)
+    print("-" * 20)
 

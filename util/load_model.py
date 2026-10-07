@@ -22,8 +22,8 @@ def get_llm(model: str = "qwen-plus"):
 
 def get_embed():
     # 加载本地的嵌入模型
-    # model_name = r"/Users/zhangjinshan/LLM/local_model/BAAI/bge-small-zh-v1.5"
-    model_name = r"/Users/zhangjinshan/LLM/local_model/BAAI/bge-large-zh-v1___5"
+    model_name = r"/Users/zhangjinshan/LLM/local_model/BAAI/bge-small-zh-v1.5"
+    # model_name = r"/Users/zhangjinshan/LLM/local_model/BAAI/bge-large-zh-v1___5"
     embed_model = HuggingFaceEmbedding(model_name=model_name, device="cpu", max_length=512)
     # 设置默认的向量模型为本地模型（不设置会回落到 OpenAI embedding 并报 No API key）
     Settings.embed_model = embed_model

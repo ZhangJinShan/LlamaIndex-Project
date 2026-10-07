@@ -2,12 +2,6 @@ from llama_index.core import SimpleDirectoryReader, StorageContext
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.storage.docstore import SimpleDocumentStore
 
-from util.load_model import get_llm, get_embed
-
-# 加载 llm 和 embedding 模型
-llm = get_llm()
-embed = get_embed()
-
 # 加载文档并构建索引
 documents = SimpleDirectoryReader(input_files=["./data/小说.txt"]).load_data()
 

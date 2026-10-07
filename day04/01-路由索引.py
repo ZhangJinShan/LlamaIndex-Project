@@ -23,8 +23,8 @@ class EnterpriseKnowledgeBase:
         product_documents = SimpleDirectoryReader(input_files=["./data/DeepSeek15天指导手册——从入门到精通.pdf"]).load_data()
 
         # 2. 创建向量索引
-        tech_index = VectorStoreIndex.from_documents(documents=tech_documents)
-        product_index = VectorStoreIndex.from_documents(documents=product_documents)
+        tech_index = VectorStoreIndex.from_documents(documents=tech_documents, show_progress=True)
+        product_index = VectorStoreIndex.from_documents(documents=product_documents, show_progress=True)
 
         # 3. 配置查询引擎
         tech_engine = tech_index.as_query_engine(similarity_top_k=3, response_mode="compact")
